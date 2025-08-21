@@ -8,6 +8,7 @@ import jawline_math as jm
 app = FastAPI()
 shape_list = ["Round", "Long"]
 
+s3Helper = s3Helper.s3Helper()
 
 # Simple File Upload logic from user (Change to fit ACP)
 UPLOAD_FOLDER = "uploads"
@@ -61,3 +62,26 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @app.get("/mog")
 def mog(image: str) -> str:
     return "Hello world"
+
+
+@app.post("/upload")
+async def upload(file: UploadFile) -> dict: 
+    if not file or not file.filename: 
+        return "Please send file"
+        
+    try: 
+        s3_image_url = s3Helper.upload(file.filename, "test", "Help me")
+        print(s3_image_url)
+    except Exception as e:
+        print(e)
+        response_error: dict = {
+            "error": True, "error messsage": e
+        }
+        return response_error
+    else: 
+        response_successful: dict = {
+            "error": False, "image_url": s3_image_url 
+        }
+        return response_successful 
+    
+    
