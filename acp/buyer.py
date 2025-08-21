@@ -14,7 +14,7 @@ from virtuals_acp.models import ACPAgentSort, ACPJobPhase, ACPGraduationStatus, 
 load_dotenv(override=True)
 
 
-def buyer(use_thread_lock: bool = True):
+def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
     env = EnvSettings()
 
     if env.WHITELISTED_WALLET_PRIVATE_KEY is None:
@@ -113,7 +113,7 @@ def buyer(use_thread_lock: bool = True):
 
     # Browse available agents based on a keyword and cluster name
     relevant_agents = acp.browse_agents(
-        keyword="JLCDR Seller",
+        keyword="Sigma boy",
         sort_by=[
             ACPAgentSort.SUCCESSFUL_JOB_COUNT,
         ],
@@ -134,8 +134,8 @@ def buyer(use_thread_lock: bool = True):
             # <your_schema_field> can be found in your ACP Visualiser's "Edit Service" pop-up.
             # Reference: (./images/specify_requirement_toggle_switch.png)
             service_requirement={
-                "imageUrl": "SleepyJoe.png" ,
-                "prompt": "My face looks like a pineapple pizz"
+                "imageUrl": image_url ,
+                "prompt": prompt
             },
             evaluator_address=env.BUYER_AGENT_WALLET_ADDRESS,
             expired_at=datetime.now() + timedelta(days=1)
@@ -147,4 +147,4 @@ def buyer(use_thread_lock: bool = True):
 
 
 if __name__ == "__main__":
-    buyer()
+    buyer(image_url="SleepyJoe.png", prompt="Hello I need to mog my friends")

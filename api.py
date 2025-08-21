@@ -17,8 +17,8 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.post("/iniate-buyer")
-async def iniate_buyer(): 
-    buyer()
+async def iniate_buyer(image_url:str, prompt:str): 
+    buyer(image_url, prompt)
 
 
 @app.post("/upload-image/")
@@ -61,34 +61,29 @@ def process_image(filename : str):
     else:
         return "⚠️Warning: Could not detect a face. Try another photo."
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
 @app.get("/mog")
 def mog(image: str) -> str:
-    return "Hello world"
+    return "hello "
 
 
-@app.post("/upload")
-async def upload(file: UploadFile) -> dict: 
-    if not file or not file.filename: 
-        return "Please send file"
+# @app.post("/upload")
+# async def upload(file: UploadFile) -> dict: 
+#     if not file or not file.filename: 
+#         return "Please send file"
         
-    try: 
-        s3_image_url = s3Helper.upload(file.filename, "test", "Help me")
-        print(s3_image_url)
-    except Exception as e:
-        print(e)
-        response_error: dict = {
-            "error": True, "error messsage": e
-        }
-        return response_error
-    else: 
-        response_successful: dict = {
-            "error": False, "image_url": s3_image_url 
-        }
-        return response_successful 
+#     try: 
+#         s3_image_url = s3Helper.upload(file.filename, "test", "Help me")
+#         print(s3_image_url)
+#     except Exception as e:
+#         print(e)
+#         response_error: dict = {
+#             "error": True, "error messsage": e
+#         }
+#         return response_error
+#     else: 
+#         response_successful: dict = {
+#             "error": False, "image_url": s3_image_url 
+#         }
+#         return response_successful 
     
     
