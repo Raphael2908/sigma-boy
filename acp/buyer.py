@@ -133,7 +133,10 @@ def buyer(use_thread_lock: bool = True):
         job_id = chosen_job_offering.initiate_job(
             # <your_schema_field> can be found in your ACP Visualiser's "Edit Service" pop-up.
             # Reference: (./images/specify_requirement_toggle_switch.png)
-            service_requirement={"<your_schema_field>": "Help me to generate a flower meme."},
+            service_requirement={
+                "imageUrl": "SleepyJoe.png" ,
+                "prompt": "My face looks like a pineapple pizz"
+            },
             evaluator_address=env.BUYER_AGENT_WALLET_ADDRESS,
             expired_at=datetime.now() + timedelta(days=1)
         )
