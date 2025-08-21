@@ -134,7 +134,7 @@ def buyer(use_thread_lock: bool = True):
             # <your_schema_field> can be found in your ACP Visualiser's "Edit Service" pop-up.
             # Reference: (./images/specify_requirement_toggle_switch.png)
             service_requirement={
-                "self_image_url": "",
+                "imageUrl": "SleepyJoe.png" ,
                 "prompt": "My face looks like a pineapple pizz"
             },
             evaluator_address=env.BUYER_AGENT_WALLET_ADDRESS,

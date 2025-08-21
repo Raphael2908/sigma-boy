@@ -8,8 +8,29 @@ from dotenv import load_dotenv
 from virtuals_acp import VirtualsACP, ACPJob, ACPJobPhase, ACPMemo, IDeliverable
 from virtuals_acp.env import EnvSettings
 
+import requests
+
 load_dotenv(override=True)
 
+def test_get_api_endpoint():
+    url = "https://jsonplaceholder.typicode.com/posts/1"  # Example public API endpoint
+    response = requests.get(url)
+
+    # Assert status code
+    assert response.status_code == 200
+
+    # Assert content (e.g., check for a specific key in JSON response)
+    data = response.json()
+
+    assert "title" in data
+    assert data["id"] == 1
+
+def mog(image_url: str, prompt: str, job_id: int): 
+    # image_url: s3 bucket link
+    # prompt: user prompt
+    # job_id: job id from buyer
+    return 
+    
 
 def seller(use_thread_lock: bool = True):
     env = EnvSettings()
@@ -95,6 +116,8 @@ def seller(use_thread_lock: bool = True):
                 memo_to_sign.next_phase == ACPJobPhase.EVALUATION
         ):
             print(f"Delivering job {job.id}")
+            print(f"job memo: {job.memos}" )
+            # test_get_api_endpoint()
             # code to call ai models here
             deliverable = IDeliverable(
                 type="url",

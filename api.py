@@ -4,6 +4,8 @@ from PIL import Image
 import shutil
 import os
 import jawline_math as jm
+from acp import buyer
+from utils import s3Helper
 
 app = FastAPI()
 shape_list = ["Round", "Long"]
@@ -13,6 +15,11 @@ s3Helper = s3Helper.s3Helper()
 # Simple File Upload logic from user (Change to fit ACP)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.post("/iniate-buyer")
+async def iniate_buyer(): 
+    buyer()
+
 
 @app.post("/upload-image/")
 async def upload_image(file: UploadFile = File(...)):
