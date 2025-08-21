@@ -35,4 +35,10 @@ class s3Helper:
         )
         print(url)
         
-        return url 
+        return url
+
+    def download(self, image_key: str): 
+        """Download the image specified by the image_key and store it in the mesh folder"""
+        
+        self.s3.download_file('sigma-boy-bucket', image_key, f"mesh/{image_key}")
+        return f"mesh/{image_key}"
