@@ -128,6 +128,9 @@
     .prose p{ margin: 0 0 1em 0; }
     .prose .muted{ color: var(--muted); }
 
+    .prose { white-space: pre-line; }
+
+
     /* Subtle divider with gradient accents */
     .divider{
       height:1px; margin: 16px 20px;
@@ -197,12 +200,7 @@
 
       <div class="content">
         <div class="prose" id="text-content">
-          {% if is_html %}
-            {{ text_content | safe }}
-          {% else %}
-            {# Escape HTML, preserve newlines; Jinja replace returns a string we then mark safe #}
-            {{ (text_content | e | replace('\n','<br>')) | safe }}
-          {% endif %}
+          {{ text_content | e }}
         </div>
       </div>
     </section>

@@ -37,14 +37,21 @@ def evaluation(request: Request, key: str):
     # Download text
     guidance_path = f"guidance-{key}.txt"
     evaluation_path_text = f"evaluation/{guidance_path}.txt"
+    
     s3Helper.download(guidance_path, evaluation_path_text)
+
+    with open(evaluation_path_text, 'r') as file:
+        content = file.read()
+
     templates = Jinja2Templates(directory="templates")
 
     DOCS_DIR = Path("evaluation").resolve()  # put your .txt files here
 
     path = (DOCS_DIR /f"{guidance_path}.txt").resolve()
     guidance = path.read_text(encoding="utf-8")
+    
 
+        
     return templates.TemplateResponse(
         "index.html",
         {
@@ -53,9 +60,9 @@ def evaluation(request: Request, key: str):
             "heading": "Your Image & Analysis",
             "image_src": mesh_url, 
             "image_alt": "User submission",
-            "caption": "Uploaded locally from /static/images/face.png",
+            "caption": f"Uploaded locally from {mesh_url}",
             "text_content": guidance,
-            "is_html": False,  # set True if you pass HTML in text_content
+            "is_html": True,  # set True if you pass HTML in text_content
         }
     )
 
