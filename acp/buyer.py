@@ -10,9 +10,11 @@ from virtuals_acp.client import VirtualsACP
 from virtuals_acp.env import EnvSettings
 from virtuals_acp.job import ACPJob
 from virtuals_acp.models import ACPAgentSort, ACPJobPhase, ACPGraduationStatus, ACPOnlineStatus
+import uuid
+
+import requests
 
 load_dotenv(override=True)
-
 
 def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
     env = EnvSettings()
@@ -28,6 +30,16 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
     job_queue_lock = threading.Lock()
     initiate_job_lock = threading.Lock()
     job_event = threading.Event()
+
+
+    with open(image_url, "rb") as f:
+        key = uuid.uuid4()
+        files = {"image": (image_url, f, "image/png")}
+        data = {"key": str(key), "prompt": prompt}
+        res = requests.post("http://127.0.0.1:8000/upload", files=files, data=data)
+    
+    print(res.json())
+    s3_image_url = res.json()['image_url']
 
     def safe_append_job(job, memo_to_sign: Optional[ACPMemo] = None):
         if use_thread_lock:
@@ -128,18 +140,21 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
     # Pick one of the service offerings based on your criteria (in this example we just pick the first one)
     chosen_job_offering = chosen_agent.offerings[0]
+    # Request for s3_image_url
+
 
     with initiate_job_lock:
         job_id = chosen_job_offering.initiate_job(
             # <your_schema_field> can be found in your ACP Visualiser's "Edit Service" pop-up.
             # Reference: (./images/specify_requirement_toggle_switch.png)
             service_requirement={
-                "imageUrl": image_url ,
+                "imageUrl": s3_image_url,
                 "prompt": prompt
             },
             evaluator_address=env.BUYER_AGENT_WALLET_ADDRESS,
             expired_at=datetime.now() + timedelta(days=1)
         )
+      
         print(f"Job {job_id} initiated.")
 
     print("Listening for next steps...")
@@ -147,4 +162,4 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
 
 if __name__ == "__main__":
-    buyer(image_url="SleepyJoe.png", prompt="Hello I need to mog my friends")
+    buyer(image_url="SleepyJoe.png", prompt="Hello I need help to improve my face")

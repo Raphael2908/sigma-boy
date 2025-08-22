@@ -31,7 +31,7 @@ class s3Helper:
         url = self.s3.generate_presigned_url(
             'get_object', 
             Params={'Bucket':self.BUCKET_NAME, 'Key':key},
-            ExpiresIn=3600
+            ExpiresIn=18000
         )
         print(url)
         
@@ -42,3 +42,6 @@ class s3Helper:
         
         self.s3.download_file('sigma-boy-bucket', image_key, f"mesh/{image_key}")
         return f"mesh/{image_key}"
+# s3Helper = s3Helper()
+
+# s3Helper.upload("SleepyJoe.png", "test-llm", "Help me")

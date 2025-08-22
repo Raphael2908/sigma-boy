@@ -12,12 +12,17 @@ import requests
 
 load_dotenv(override=True)
 
-def mog(image_url: str, prompt: str, job_id: int): 
-    # image_url: s3 bucket link
+def mog(s3_image_url: str, prompt: str, job_id: int): 
+    # s3_image_url: s3 bucket link
     # prompt: user prompt
     # job_id: job id from buyer
     print("Printing from mog")
-    print(image_url, prompt, job_id)
+    print(s3_image_url, prompt, job_id)
+    requests.post("http://127.0.0.1:8000/mog", data={
+        "s3_image_url": s3_image_url, 
+        "prompt": prompt, 
+        "job_id": job_id
+    })
     return "https://example.com"
     
 
@@ -107,7 +112,7 @@ def seller(use_thread_lock: bool = True):
             print(f"Delivering job {job.id}")
             print(f"job memo: {job.dict}" )
             mog_url = mog(
-                image_url=job.service_requirement['imageUrl'],
+                s3_image_url=job.service_requirement['imageUrl'],
                 prompt=job.service_requirement['prompt'],
                 job_id=job.id
             )

@@ -1,5 +1,5 @@
-from typing import Union
-from fastapi import FastAPI, UploadFile, File
+from typing import Union, Annotated
+from fastapi import FastAPI, UploadFile, File, Form
 from PIL import Image
 import shutil
 import os
@@ -62,28 +62,39 @@ def process_image(filename : str):
         return "⚠️Warning: Could not detect a face. Try another photo."
 
 @app.get("/mog")
-def mog(image: str) -> str:
-    return "hello "
+def mog(s3_image_url: str, prompt: str, job_id: str) -> str:
+    output: {
+        "image_mesh": "s3_mesh_image_url", "jawline_feedback": {"shape": "oval", "description": "Too fat"}
+    } = calebImageProcessor()
+    guide: str = LLM(prompt, s3_image_url, jawline_feedback)
+    return {
+        "image_mesh": "s3_mesh_image_url", 
+        "guide": "Here is how you improve your face...."
+    }
 
 
-# @app.post("/upload")
-# async def upload(file: UploadFile) -> dict: 
-#     if not file or not file.filename: 
-#         return "Please send file"
-        
-#     try: 
-#         s3_image_url = s3Helper.upload(file.filename, "test", "Help me")
-#         print(s3_image_url)
-#     except Exception as e:
-#         print(e)
-#         response_error: dict = {
-#             "error": True, "error messsage": e
-#         }
-#         return response_error
-#     else: 
-#         response_successful: dict = {
-#             "error": False, "image_url": s3_image_url 
-#         }
-#         return response_successful 
+@app.post("/upload")
+async def upload(
+        image: UploadFile, 
+        key: Annotated[str, Form()], 
+        prompt: Annotated[str, Form()]
+    ) -> dict: 
+    
+    if not image or not image.filename: 
+        return "Please send file"
+    try: 
+        s3_image_url = s3Helper.upload(image.filename, key, prompt)
+        print(s3_image_url)
+    except Exception as e:
+        print(e)
+        response_error: dict = {
+            "error": True, "error messsage": e
+        }
+        return response_error
+    else: 
+        response_successful: dict = {
+            "error": False, "image_url": s3_image_url 
+        }
+        return response_successful 
     
     
