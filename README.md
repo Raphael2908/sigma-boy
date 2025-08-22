@@ -65,6 +65,11 @@ python acp/buyer.py
 ```
 4. View results: 
 
+> got to: https://app.virtuals.io/acp
+
+> search: "sigma boi"
+
+> select job and view result
 
 
 ## 📝 API Endpoints
