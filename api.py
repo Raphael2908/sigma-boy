@@ -1,81 +1,44 @@
 from typing import Union, Annotated
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.responses import FileResponse
+
 from PIL import Image
 import shutil
 import os
 import jawline_math as jm
 # Temporarily commenting out these imports for testing
 # from acp import buyer
-# from utils import s3Helper
+from utils import s3Helper
+
+from gemini_evaluator.evaluator import analyze_facial_features
 
 app = FastAPI()
 shape_list = ["Round", "Long"]
 
 # Temporarily commented out for testing
-# s3Helper = s3Helper.s3Helper()
+s3Helper = s3Helper.s3Helper()
 
 # Simple File Upload logic from user (Change to fit ACP)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@app.post("/iniate-buyer")
-async def iniate_buyer(image_url:str, prompt:str): 
-    buyer(image_url, prompt)
-
-
-@app.post("/upload-image/")
-async def upload_image(file: UploadFile = File(...)):
-    # save the uploaded file to disk
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "message":  f"Image saved at {file_path}"
-    }
-
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-
-@app.get("/get-image/{filename}")
-def process_image(filename : str):
-    uploaded_file = os.path.join(UPLOAD_FOLDER, filename)
-    if not os.path.exists(uploaded_file):
-        return f'error : {filename} not found'
+@app.get("/evaluation/{key}")
+def evaluation(key: str, guidance: str):
+    # Download image from s3
     
-    image = Image.open(uploaded_file)
-    output_image, landmarks = jm.draw_face_landmarks(image)
+    return FileResponse(path)
 
-    if output_image is not None and landmarks:
-        # placeholder (initially used to do a side-by-side comparison on st)
-        print("landmarks")
-        shape = jm.classify_face_shape(landmarks, image.size[::-1])
-        print(f"🧬 Detected Face Shape:** `{shape}`")
-        
-        if shape in shape_list:
-            return "⚠️ Your jawline could be enhanced with regular exercises."
-
-        else:
-            return "🎯 Your jawline appears naturally well-defined based on facial proportions!"
-    else:
-        return "⚠️Warning: Could not detect a face. Try another photo."
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-from gemini_evaluator.evaluator import analyze_facial_features
 
 @app.get("/mog")
-async def mog(image: str, prompt: str, job_id: str) -> dict:
+async def mog(image: str, prompt: str, unique_key: str) -> dict:
     try:
         print(f"Processing request for image: {image}")
         # First process the image with your existing jawline detection
-        uploaded_file = os.path.join(UPLOAD_FOLDER, image)
+        uploaded_file = s3Helper.download(unique_key, f"{UPLOAD_FOLDER}/{unique_key}.png")
         if not os.path.exists(uploaded_file):
             print(f"Image not found: {uploaded_file}")
             return {"error": f"Image {image} not found"}
@@ -156,7 +119,12 @@ async def mog(image: str, prompt: str, job_id: str) -> dict:
   - {other_features['facial_harmony']['enhancement_suggestions'][1]}"""
             
             print("Analysis complete!")
-            return {"formatted_response": readable_response}
+            mesh_image = Image.fromarray(output_image)
+            mesh_path = f"mesh/{unique_key}.png"
+            mesh_image.save(mesh_path)
+            mesh_key = f"mesh-{unique_key}"
+            s3Helper.upload(image_path=mesh_path, key=mesh_key)
+            return {"formatted_response": readable_response, "mesh_key": mesh_key}
         else:
             print("No landmarks detected")
             return {
@@ -171,25 +139,27 @@ async def mog(image: str, prompt: str, job_id: str) -> dict:
         }
 
 
-# Temporarily commented out for testing
-# @app.post("/upload")
-# async def upload(file: UploadFile) -> dict: 
-#     if not file or not file.filename: 
-#         return "Please send file"
-        
-#     try: 
-#         s3_image_url = s3Helper.upload(file.filename, "test", "Help me")
-#         print(s3_image_url)
-#     except Exception as e:
-#         print(e)
-#         response_error: dict = {
-#             "error": True, "error messsage": e
-#         }
-#         return response_error
-#     else: 
-#         response_successful: dict = {
-#             "error": False, "image_url": s3_image_url 
-#         }
-#         return response_successful 
+@app.post("/upload")
+async def upload(
+        image: UploadFile, 
+        key: Annotated[str, Form()], 
+        prompt: Annotated[str, Form()]
+    ) -> dict: 
     
-    
+    if not image or not image.filename: 
+        return "Please send file"
+    try: 
+        s3_image_url = s3Helper.upload(image.filename, key, prompt)
+        print(s3_image_url)
+    except Exception as e:
+        print(e)
+        response_error: dict = {
+            "error": True, "error messsage": e
+        }
+        return response_error
+    else: 
+        response_successful: dict = {
+            "error": False, "image_url": s3_image_url 
+        }
+        return response_successful
+

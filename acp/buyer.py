@@ -37,8 +37,7 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
         files = {"image": (image_url, f, "image/png")}
         data = {"key": str(key), "prompt": prompt}
         res = requests.post("http://127.0.0.1:8000/upload", files=files, data=data)
-    
-    print(res.json())
+
     s3_image_url = res.json()['image_url']
 
     def safe_append_job(job, memo_to_sign: Optional[ACPMemo] = None):
@@ -125,7 +124,7 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
     # Browse available agents based on a keyword and cluster name
     relevant_agents = acp.browse_agents(
-        keyword="Sigma boy",
+        keyword="Sigma boi",
         sort_by=[
             ACPAgentSort.SUCCESSFUL_JOB_COUNT,
         ],
@@ -149,7 +148,8 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
             # Reference: (./images/specify_requirement_toggle_switch.png)
             service_requirement={
                 "imageUrl": s3_image_url,
-                "prompt": prompt
+                "prompt": prompt,
+                "unique_key": str(key)
             },
             evaluator_address=env.BUYER_AGENT_WALLET_ADDRESS,
             expired_at=datetime.now() + timedelta(days=1)
@@ -162,4 +162,4 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
 
 if __name__ == "__main__":
-    buyer(image_url="SleepyJoe.png", prompt="Hello I need help to improve my face")
+    buyer(image_url="SleepyJoe.png", prompt="I want to start my self improvement and looks maxxing journey. Please advice on how I can improve by analysing my jawline")
