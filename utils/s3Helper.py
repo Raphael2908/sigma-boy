@@ -7,7 +7,7 @@ load_dotenv(override=True)
 
 class s3Helper: 
     
-    BUCKET_NAME: str = "sigma-boy-bucket"  # static
+    BUCKET_NAME: str = "sigma-boi-bucket"  # static
 
     s3: object = boto3.client('s3', 
         region_name="ap-southeast-1",
@@ -16,7 +16,7 @@ class s3Helper:
         config=Config(signature_version='v4')
     ) # s3 client
 
-    def upload(self, image_path: str, key: str, prompt: str = None) -> str:
+    def upload(self, image_path: str, key: str, prompt: str = None, advice: str = None) -> str:
         """ Upload image of user to s3 bucket so that ai model and pull, return string url""" 
         if(image_path == None): 
             return Exception('error, no image path')
@@ -26,19 +26,44 @@ class s3Helper:
                 Key=key,
                 Body=f,
                 ContentType="image/png",   
-                Metadata={"prompt": prompt or ""}
+                Metadata={"prompt": prompt or "", "advice": advice or ""}
             )
         url = self.s3.generate_presigned_url(
             'get_object', 
             Params={'Bucket':self.BUCKET_NAME, 'Key':key},
-            ExpiresIn=3600
+            ExpiresIn=18000
         )
         print(url)
         
         return url
 
-    def download(self, image_key: str): 
+    def download(self, image_key: str, path): 
         """Download the image specified by the image_key and store it in the mesh folder"""
         
-        self.s3.download_file('sigma-boy-bucket', image_key, f"mesh/{image_key}")
-        return f"mesh/{image_key}"
+        self.s3.download_file('sigma-boi-bucket', image_key, path)
+        return path
+
+
+    def upload_txt(self, filename: str, unique_key:str):
+        try:
+            # Upload the file
+            s3_key=f"guidance-{unique_key}.txt"
+            self.s3.upload_file(Filename=filename, Bucket=self.BUCKET_NAME, Key=s3_key)
+            print(f"'{s3_key}' uploaded successfully to '{self.BUCKET_NAME}/{s3_key}'")
+        except Exception as e:
+            print(f"Error uploading file: {e}")
+
+    def generate_presigned_url(self, unique_key:str):
+        try:
+            response = self.s3.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': self.BUCKET_NAME, 'Key': unique_key},
+                ExpiresIn=180000,
+            )
+        except ClientError as e:
+            logging.error(e)
+            return None
+
+        # The response contains the presigned URL
+        return response
+        

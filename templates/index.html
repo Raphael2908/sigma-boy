@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ page_title or "App" }}</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --card: #0f1722cc; /* glassy */
+      --text: #e6edf7;
+      --muted: #9aa6b2;
+      --ring: 0 0 0 1px rgba(255,255,255,0.08) inset;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --accent1: #7c3aed; /* purple */
+      --accent2: #06b6d4; /* cyan */
+      --accent3: #22d3ee; /* light-cyan */
+      --maxw: 900px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f6f8fb;
+        --card: #ffffffcc;
+        --text: #0b1320;
+        --muted: #5b6572;
+        --ring: 0 0 0 1px rgba(0,0,0,0.06) inset;
+        --shadow: 0 10px 30px rgba(12,20,33,.08);
+      }
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+            Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+            "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(124,58,237,.15), transparent 60%),
+                  radial-gradient(1000px 500px at 120% 10%, rgba(34,211,238,.12), transparent 60%),
+                  var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Top gradient bar like many web3 dashboards */
+    .top-accent{
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3));
+    }
+
+    .wrap{
+      max-width: var(--maxw);
+      margin: 48px auto 64px auto;
+      padding: 0 20px;
+    }
+
+    .header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      margin-bottom:24px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background: linear-gradient(145deg, var(--accent1), var(--accent2));
+      box-shadow: 0 6px 18px rgba(6,182,212,.25), inset var(--ring);
+    }
+    .title{
+      font-weight:700; font-size: clamp(18px, 2vw, 22px); letter-spacing:.2px;
+    }
+    .subtitle{
+      color: var(--muted); font-size: 14px;
+    }
+
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: saturate(140%) blur(8px);
+      border: 1px solid rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    .card-head{
+      padding: 18px 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 40%),
+        radial-gradient(600px 120px at 0% 0%, rgba(34,211,238,.12), transparent 60%);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .card-head h1{
+      margin:0; font-size: clamp(20px, 2.2vw, 26px);
+      letter-spacing:.2px;
+    }
+
+    .media{
+      position:relative;
+      padding: 16px;
+    }
+    .img-wrap{
+      border-radius: calc(var(--radius) - 8px);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.22);
+      background: #000000;
+    }
+    .img-wrap img{
+      display:block; width:100%; height:auto;
+      aspect-ratio: 16/9; object-fit: cover;
+    }
+    .caption{
+      font-size: 13px; color: var(--muted);
+      margin-top: 10px; text-align: center;
+    }
+
+    .content{
+      padding: 10px 20px 24px 20px;
+    }
+    .prose{
+      line-height: 1.85;
+      font-size: 16.5px;
+      color: var(--text);
+    }
+    .prose p{ margin: 0 0 1em 0; }
+    .prose .muted{ color: var(--muted); }
+
+    .prose { white-space: pre-line; }
+
+
+    /* Subtle divider with gradient accents */
+    .divider{
+      height:1px; margin: 16px 20px;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    }
+
+    /* Small badge like Streamlit status pills */
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .dot{ width:8px; height:8px; border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #34d399, #059669);
+      box-shadow: 0 0 0 3px rgba(52,211,153,.18);
+    }
+
+    footer{
+      margin-top: 28px; color: var(--muted); font-size: 13px; text-align:center;
+    }
+    .link{ color: inherit; opacity:.9; text-decoration: none; border-bottom:1px dashed rgba(255,255,255,.3) }
+    .link:hover{ opacity:1 }
+
+    /* Prefer reduced motion */
+    @media (prefers-reduced-motion: no-preference){
+      .img-wrap{ transform: translateY(0); transition: transform .25s ease }
+      .img-wrap:hover{ transform: translateY(-2px) }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-accent"></div>
+
+  <div class="wrap">
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">{{ page_title or "Clean Web App" }}</div>
+          <div class="subtitle">Streamlit-inspired · Web3-flavored UI</div>
+        </div>
+      </div>
+      <div class="pill" title="Render status">
+        <span class="dot"></span> Ready
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-head">
+        <h1>{{ heading or "Preview" }}</h1>
+      </div>
+
+      <div class="media">
+        <div class="img-wrap">
+          <!-- Use a local/static path; e.g. /static/images/sample.png -->
+          <img src="{{ image_src or '/static/images/sample.png' }}"
+               alt="{{ image_alt or 'Uploaded image' }}" loading="eager" />
+        </div>
+        {% if caption %}
+          <div class="caption">{{ caption }}</div>
+        {% endif %}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="content">
+        <div class="prose" id="text-content">
+          {{ text_content | e }}
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span class="muted">Served by FastAPI & Jinja2.</span>
+      <br />
+      <a class="link" href="https://fastapi.tiangolo.com/advanced/templates/" target="_blank" rel="noreferrer">Templates docs</a>
+    </footer>
+  </div>
+
+  <noscript>
+    <div style="max-width:900px;margin:12px auto;padding:12px 16px;background:#fff3cd;color:#664d03;border:1px solid #ffecb5;border-radius:8px;">
+      This page looks nicer with JavaScript enabled, but it still works without it.
+    </div>
+  </noscript>
+</body>
+</html>

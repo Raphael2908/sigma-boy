@@ -2,7 +2,7 @@ import threading
 import time
 from collections import deque
 from typing import Optional
-
+import sys
 from dotenv import load_dotenv
 
 from virtuals_acp import VirtualsACP, ACPJob, ACPJobPhase, ACPMemo, IDeliverable
@@ -12,25 +12,28 @@ import requests
 
 load_dotenv(override=True)
 
-def test_get_api_endpoint():
-    url = "https://jsonplaceholder.typicode.com/posts/1"  # Example public API endpoint
-    response = requests.get(url)
+import asyncio
+import aiohttp
+import json
 
-    # Assert status code
-    assert response.status_code == 200
-
-    # Assert content (e.g., check for a specific key in JSON response)
-    data = response.json()
-
-    assert "title" in data
-    assert data["id"] == 1
-
-def mog(image_url: str, prompt: str, job_id: int): 
-    # image_url: s3 bucket link
-    # prompt: user prompt
-    # job_id: job id from buyer
-    return 
+async def call_mog(s3_image_url: str, prompt: str, unique_key: int):
+    # s3_image_url: str, prompt: str, unique_key: int
+    # Using one of your existing sample images
+    image_path = "/Users/raphael/Develop/sigma-boi/Caleb.png"  # or "SleepyJoe.png"
     
+    # Test parameters
+    params = {
+        "image": s3_image_url,
+        "prompt": prompt,
+        "unique_key": unique_key
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get("http://127.0.0.1:8000/mog", params=params) as response:
+            print("Status Code:", response.status)
+            # print("Response:", await response.json())
+    
+    return f"http://127.0.0.1:8000/evaluation/{unique_key}"
 
 def seller(use_thread_lock: bool = True):
     env = EnvSettings()
@@ -116,12 +119,16 @@ def seller(use_thread_lock: bool = True):
                 memo_to_sign.next_phase == ACPJobPhase.EVALUATION
         ):
             print(f"Delivering job {job.id}")
-            print(f"job memo: {job.memos}" )
-            # test_get_api_endpoint()
+            print(f"job memo: {job.dict}" )
+            mog_url = asyncio.run(call_mog(
+                s3_image_url=job.service_requirement['imageUrl'],
+                prompt=job.service_requirement['prompt'],
+                unique_key=job.service_requirement['unique_key'],
+            ))
             # code to call ai models here
             deliverable = IDeliverable(
                 type="url",
-                value="https://example.com"
+                value=mog_url
             )
             job.deliver(deliverable)
         elif job.phase == ACPJobPhase.COMPLETED:
@@ -145,3 +152,4 @@ def seller(use_thread_lock: bool = True):
 
 if __name__ == "__main__":
     seller()
+    # asyncio.run(call_mog())
