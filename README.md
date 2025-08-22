@@ -29,7 +29,7 @@ cd sigma-boy
 ```bash
 python -m venv venv
 # On Windows:
-.\venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 # On Unix or MacOS:
 source venv/bin/activate
 ```
