@@ -29,7 +29,7 @@ cd sigma-boi
 ```bash
 python -m venv venv
 # On Windows:
-.\venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 # On Unix or MacOS:
 source venv/bin/activate
 ```
@@ -65,6 +65,11 @@ python acp/buyer.py
 ```
 4. View results: 
 
+> got to: https://app.virtuals.io/acp
+
+> search: "sigma boi"
+
+> select job and view result
 
 
 ## 📝 API Endpoints
