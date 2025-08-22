@@ -1,6 +1,8 @@
 from typing import Union, Annotated
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import FileResponse
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
 
 from PIL import Image
 import shutil
@@ -27,10 +29,35 @@ def read_root():
     return {"Hello": "World"}
 
 @app.get("/evaluation/{key}")
-def evaluation(key: str, guidance: str):
-    # Download image from s3
+def evaluation(request: Request, key: str):
+    # generate presigned image from s3
+    mesh_path = f"mesh-{key}"
+    mesh_url = s3Helper.generate_presigned_url(mesh_path)
     
-    return FileResponse(path)
+    # Download text
+    guidance_path = f"guidance-{key}"
+    evaluation_path_text = f"evaluation/{guidance_path}.txt"
+    s3Helper.download(guidance_path, evaluation_path_text)
+    templates = Jinja2Templates(directory="templates")
+    
+    DOCS_DIR = Path("evaluation").resolve()  # put your .txt files here
+
+    path = (DOCS_DIR /f"{guidance_path}.txt").resolve()
+    guidance = path.read_text(encoding="utf-8")
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "page_title": "Sigma boy",
+            "heading": "Your Image & Analysis",
+            "image_src": mesh_url, 
+            "image_alt": "User submission",
+            "caption": "Uploaded locally from /static/images/face.png",
+            "text_content": guidance,
+            "is_html": False,  # set True if you pass HTML in text_content
+        }
+    )
 
 
 @app.get("/mog")
@@ -123,7 +150,14 @@ async def mog(image: str, prompt: str, unique_key: str) -> dict:
             mesh_path = f"mesh/{unique_key}.png"
             mesh_image.save(mesh_path)
             mesh_key = f"mesh-{unique_key}"
-            s3Helper.upload(image_path=mesh_path, key=mesh_key)
+            mesh_url = s3Helper.upload(image_path=mesh_path, key=mesh_key)
+
+            # Save text
+            guidance_path = f"guidance/guidance-{unique_key}"
+            with open(guidance_path, "w") as file:
+              file.write(readable_response)
+            
+            s3Helper.upload_txt(filename=guidance_path, unique_key=unique_key) 
             return {"formatted_response": readable_response, "mesh_key": mesh_key}
         else:
             print("No landmarks detected")

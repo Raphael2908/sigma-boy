@@ -42,6 +42,28 @@ class s3Helper:
         
         self.s3.download_file('sigma-boy-bucket', image_key, path)
         return path
-# s3Helper = s3Helper()
 
-# s3Helper.upload("SleepyJoe.png", "test-llm", "Help me")
+
+    def upload_txt(self, filename: str, unique_key:str):
+        try:
+            # Upload the file
+            s3_key=f"guidance-{unique_key}"
+            self.s3.upload_file(Filename=s3_key, Bucket=self.BUCKET_NAME, Key=s3_key)
+            print(f"'{s3_key}' uploaded successfully to '{self.BUCKET_NAME}/{s3_key}'")
+        except Exception as e:
+            print(f"Error uploading file: {e}")
+
+    def generate_presigned_url(self, unique_key:str):
+        try:
+            response = self.s3.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': self.BUCKET_NAME, 'Key': unique_key},
+                ExpiresIn=180000,
+            )
+        except ClientError as e:
+            logging.error(e)
+            return None
+
+        # The response contains the presigned URL
+        return response
+        

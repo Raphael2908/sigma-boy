@@ -31,7 +31,7 @@ async def call_mog(s3_image_url: str, prompt: str, unique_key: int):
     async with aiohttp.ClientSession() as session:
         async with session.get("http://127.0.0.1:8000/mog", params=params) as response:
             print("Status Code:", response.status)
-            print("Response:", await response.json())
+            # print("Response:", await response.json())
     
     return f"http://127.0.0.1:8000/evaluation/{unique_key}"
 
