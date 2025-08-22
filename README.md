@@ -51,13 +51,21 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 1. Start the FastAPI server:
 ```bash
-uvicorn api:app --reload
+fastapi dev
 ```
 
-2. Test using the CLI interface:
+2. Start sigma-boy: 
 ```bash
-python test_cli.py
+python acp/sigma-boy.py
 ```
+
+3. Start buyer: 
+```bash
+python acp/buyer.py
+```
+4. View results: 
+
+
 
 ## 📝 API Endpoints
 
