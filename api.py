@@ -49,7 +49,7 @@ def evaluation(request: Request, key: str):
         "index.html",
         {
             "request": request,
-            "page_title": "Sigma boy",
+            "page_title": "Sigma boi",
             "heading": "Your Image & Analysis",
             "image_src": mesh_url, 
             "image_alt": "User submission",

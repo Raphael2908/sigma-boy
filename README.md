@@ -1,4 +1,4 @@
-# 🗿 Sigma-Boy: The Ultimate Facial Analysis Tool
+# 🗿 Sigma-Boi: The Ultimate Facial Analysis Tool
 
 A humorous yet functional facial analysis tool that combines MediaPipe facial landmark detection with Google's Gemini Vision API to provide "sigma male" style facial feature analysis and improvement suggestions.
 
@@ -21,8 +21,8 @@ A humorous yet functional facial analysis tool that combines MediaPipe facial la
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Raphael2908/sigma-boy.git
-cd sigma-boy
+git clone https://github.com/Raphael2908/sigma-boi.git
+cd sigma-boi
 ```
 
 2. Create and activate a virtual environment:
@@ -54,9 +54,9 @@ GEMINI_API_KEY=your_gemini_api_key_here
 fastapi dev
 ```
 
-2. Start sigma-boy: 
+2. Start sigma-boi: 
 ```bash
-python acp/sigma-boy.py
+python acp/sigma-boi.py
 ```
 
 3. Start buyer: 
@@ -114,7 +114,7 @@ print(analysis.json()['formatted_response'])
 ## 🏗️ Project Structure
 
 ```
-sigma-boy/
+sigma-boi/
 ├── api.py              # FastAPI server and endpoints
 ├── jawline_math.py     # Jawline detection logic
 ├── gemini_evaluator/   # Gemini Vision integration

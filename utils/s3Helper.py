@@ -7,7 +7,7 @@ load_dotenv(override=True)
 
 class s3Helper: 
     
-    BUCKET_NAME: str = "sigma-boy-bucket"  # static
+    BUCKET_NAME: str = "sigma-boi-bucket"  # static
 
     s3: object = boto3.client('s3', 
         region_name="ap-southeast-1",
@@ -40,7 +40,7 @@ class s3Helper:
     def download(self, image_key: str, path): 
         """Download the image specified by the image_key and store it in the mesh folder"""
         
-        self.s3.download_file('sigma-boy-bucket', image_key, path)
+        self.s3.download_file('sigma-boi-bucket', image_key, path)
         return path
 
 

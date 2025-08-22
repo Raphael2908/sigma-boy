@@ -4,7 +4,7 @@ import json
 
 async def test_mog():
     # Using one of your existing sample images
-    image_path = "/Users/raphael/Develop/sigma-boy/Caleb.png"  # or "SleepyJoe.png"
+    image_path = "/Users/raphael/Develop/sigma-boi/Caleb.png"  # or "SleepyJoe.png"
     
     # Test parameters
     params = {

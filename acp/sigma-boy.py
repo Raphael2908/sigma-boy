@@ -19,7 +19,7 @@ import json
 async def call_mog(s3_image_url: str, prompt: str, unique_key: int):
     # s3_image_url: str, prompt: str, unique_key: int
     # Using one of your existing sample images
-    image_path = "/Users/raphael/Develop/sigma-boy/Caleb.png"  # or "SleepyJoe.png"
+    image_path = "/Users/raphael/Develop/sigma-boi/Caleb.png"  # or "SleepyJoe.png"
     
     # Test parameters
     params = {
