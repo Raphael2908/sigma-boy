@@ -47,8 +47,8 @@ class s3Helper:
     def upload_txt(self, filename: str, unique_key:str):
         try:
             # Upload the file
-            s3_key=f"guidance-{unique_key}"
-            self.s3.upload_file(Filename=s3_key, Bucket=self.BUCKET_NAME, Key=s3_key)
+            s3_key=f"guidance-{unique_key}.txt"
+            self.s3.upload_file(Filename=filename, Bucket=self.BUCKET_NAME, Key=s3_key)
             print(f"'{s3_key}' uploaded successfully to '{self.BUCKET_NAME}/{s3_key}'")
         except Exception as e:
             print(f"Error uploading file: {e}")

@@ -153,7 +153,7 @@ async def mog(image: str, prompt: str, unique_key: str) -> dict:
             mesh_url = s3Helper.upload(image_path=mesh_path, key=mesh_key)
 
             # Save text
-            guidance_path = f"guidance/guidance-{unique_key}"
+            guidance_path = f"guidance/guidance-{unique_key}.txt"
             with open(guidance_path, "w") as file:
               file.write(readable_response)
             
