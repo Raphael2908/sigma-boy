@@ -35,11 +35,11 @@ def evaluation(request: Request, key: str):
     mesh_url = s3Helper.generate_presigned_url(mesh_path)
     
     # Download text
-    guidance_path = f"guidance-{key}"
+    guidance_path = f"guidance-{key}.txt"
     evaluation_path_text = f"evaluation/{guidance_path}.txt"
     s3Helper.download(guidance_path, evaluation_path_text)
     templates = Jinja2Templates(directory="templates")
-    
+
     DOCS_DIR = Path("evaluation").resolve()  # put your .txt files here
 
     path = (DOCS_DIR /f"{guidance_path}.txt").resolve()
