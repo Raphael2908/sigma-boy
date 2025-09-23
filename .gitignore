@@ -3,3 +3,4 @@ lib
 .env
 venv
 .aws
+sigma-boi-frontend/node_modules/
