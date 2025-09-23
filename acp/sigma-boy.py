@@ -1,20 +1,19 @@
+# Virtuals imports
 import threading
-import time
+import time # For sleep
 from collections import deque
-from typing import Optional
-import sys
-from dotenv import load_dotenv
-
 from virtuals_acp import VirtualsACP, ACPJob, ACPJobPhase, ACPMemo, IDeliverable
 from virtuals_acp.env import EnvSettings
 
+# Http imports
 import requests
-
-load_dotenv(override=True)
-
 import asyncio
 import aiohttp
 import json
+
+# Environment imports
+from dotenv import load_dotenv
+load_dotenv(override=True)
 
 async def call_mog(s3_image_url: str, prompt: str, unique_key: int):
     # s3_image_url: str, prompt: str, unique_key: int
@@ -97,7 +96,7 @@ def seller(use_thread_lock: bool = True):
     def handle_job_with_delay(job, memo_to_sign):
         try:
             process_job(job, memo_to_sign)
-            time.sleep(2)
+            time.sleep(2) # Not sure why sleep is 2, came with Virtuals ACP SDK. DO NOT TOUCH.
         except Exception as e:
             print(f"\u274c Error processing job: {e}")
 
@@ -152,4 +151,3 @@ def seller(use_thread_lock: bool = True):
 
 if __name__ == "__main__":
     seller()
-    # asyncio.run(call_mog())

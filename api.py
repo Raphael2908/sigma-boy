@@ -3,13 +3,10 @@ from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
-
-from PIL import Image
+from PIL import Image # For image mesh 
 import shutil
 import os
 import jawline_math as jm
-# Temporarily commenting out these imports for testing
-# from acp import buyer
 from utils import s3Helper
 
 from gemini_evaluator.evaluator import analyze_facial_features
@@ -30,21 +27,24 @@ def read_root():
 
 @app.get("/evaluation/{key}")
 def evaluation(request: Request, key: str):
+    
     # generate presigned image from s3
     mesh_path = f"mesh-{key}"
     mesh_url = s3Helper.generate_presigned_url(mesh_path)
     
+    # TODO: Send presigned text from s3 instead of local
+    # The below code is currently downloading from s3 to local 
+
     # Download text
     guidance_path = f"guidance-{key}.txt"
     evaluation_path_text = f"evaluation/{guidance_path}.txt"
     
-    # s3Helper.download(guidance_path, evaluation_path_text)
-
     with open(evaluation_path_text, 'r') as file:
         content = file.read()
 
+    # TODO: Redirect to NEXTJS frontend with image and text
     templates = Jinja2Templates(directory="templates")
-
+    
     DOCS_DIR = Path("evaluation").resolve()  # put your .txt files here
 
     path = (DOCS_DIR /f"{guidance_path}.txt").resolve()
@@ -66,7 +66,11 @@ def evaluation(request: Request, key: str):
         }
     )
 
-
+# TODO Clean up function below, split jawline analyser and gemini into separate functions
+# TODO Format response should not be in this function
+# TODO This function should only call two functions and combine the results 
+# TODO This API should only return the website url for Sigma boi to redirect the user to
+# TODO Frontend must pull image and text from S3 using presigned urls
 @app.get("/mog")
 async def mog(image: str, prompt: str, unique_key: str) -> dict:
     try:
@@ -78,6 +82,7 @@ async def mog(image: str, prompt: str, unique_key: str) -> dict:
             return {"error": f"Image {image} not found"}
         
         print("Processing image with jawline detection...")
+        
         # Process image with existing jawline detection
         img = Image.open(uploaded_file)
         output_image, landmarks = jm.draw_face_landmarks(img)
@@ -96,6 +101,7 @@ async def mog(image: str, prompt: str, unique_key: str) -> dict:
             # Get Gemini's analysis for other facial features
             other_features = analyze_facial_features(uploaded_file)
             
+            # TODO Formatting Below should be in a function 
             # Format the response in a readable way
             readable_response = f"""� SIGMA MALE FACIAL ANALYSIS REPORT 💪
 
