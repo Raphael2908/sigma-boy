@@ -38,7 +38,7 @@ def evaluation(request: Request, key: str):
     guidance_path = f"guidance-{key}.txt"
     evaluation_path_text = f"evaluation/{guidance_path}.txt"
     
-    s3Helper.download(guidance_path, evaluation_path_text)
+    # s3Helper.download(guidance_path, evaluation_path_text)
 
     with open(evaluation_path_text, 'r') as file:
         content = file.read()
