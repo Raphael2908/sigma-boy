@@ -1,5 +1,30 @@
+# Virtual environments
 bin
 lib
-.env
 venv
+.venv
+
+# Environment and config files  
+.env
 .aws
+
+# User-generated content (contains personal images/analysis)
+guidance/
+mesh/
+uploads/
+evaluation/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and system files
+.DS_Store
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
