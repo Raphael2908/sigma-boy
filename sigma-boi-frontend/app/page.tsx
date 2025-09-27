@@ -80,9 +80,9 @@ export default function Page() {
             </p>
             <div className="flex flex-wrap gap-2">
               <Button asChild size="lg">
-                <a href="https://app.virtuals.io/acp" target="_blank" rel="noopener noreferrer">
-                  Launch on Virtuals
-                </a>
+                <Link href="/try" target="_blank" rel="noopener noreferrer">
+                  Try the Agent
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
                 <a
@@ -137,9 +137,9 @@ export default function Page() {
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild>
-                <a href="https://app.virtuals.io/acp" target="_blank" rel="noopener noreferrer">
+                <Link href="/try" target="_blank" rel="noopener noreferrer">
                   Try the Agent
-                </a>
+                </Link>
               </Button>
               <Button asChild variant="outline">
                 <a

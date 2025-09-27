@@ -3,7 +3,8 @@ from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
-
+from fastapi import HTTPException
+import acp 
 from PIL import Image
 import shutil
 import os
@@ -17,9 +18,25 @@ from formatters.response_formatter import format_sigma_analysis_report
 from services.jawline_service import analyze_jawline
 from services.gemini_service import analyze_facial_features_service
 from services.file_service import save_and_upload_mesh_image, save_and_upload_analysis_text
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
+
 
 app = FastAPI()
 shape_list = ["Round", "Long"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Temporarily commented out for testing
 s3Helper = s3Helper.s3Helper()
@@ -143,3 +160,31 @@ async def upload(
         }
         return response_successful
 
+
+@app.post("/call/buyer")
+async def call_buyer(
+        image: UploadFile, 
+        prompt: Annotated[str, Form()]
+        ) -> dict:
+    UPLOAD_DIRECTORY = "local_images"
+    if not image or not image.filename: 
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+    file_location = os.path.join(UPLOAD_DIRECTORY, image.filename)
+
+     # Save the file content
+    with open(file_location, "wb") as buffer:
+            # Read the uploaded file in chunks and write to the local file
+        while content := await image.read(1024 * 1024): # Read in 1MB chunks
+            buffer.write(content)
+    try: 
+        deliverable = acp.buyer(image_url=file_location, prompt=prompt)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        return {
+            "error": "Internal server error",
+            "details": str(e)
+        }
+    
+    return deliverable
