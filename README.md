@@ -39,12 +39,24 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables:
+4. Create required directories:
+```bash
+mkdir uploads guidance mesh evaluation templates
+```
+
+5. Set up environment variables:
 Create a `.env` file in the project root with:
 ```env
 GOOGLE_API_KEY=your_gemini_api_key_here
 # or
 GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+6. Set up AWS credentials (for S3 storage):
+```env
+# Add to your .env file:
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 ```
 
 ## 🏃‍♂️ Running the Application
@@ -56,7 +68,7 @@ fastapi dev
 
 2. Start sigma-boi: 
 ```bash
-python acp/sigma-boi.py
+python acp/sigma-boy.py
 ```
 
 3. Start buyer: 
@@ -86,7 +98,7 @@ python acp/buyer.py
 - **Parameters**:
   - `image`: filename of uploaded image
   - `prompt`: analysis prompt
-  - `job_id`: unique identifier
+  - `unique_key`: unique identifier
 - **Returns**: Comprehensive facial analysis including:
   - Jawline assessment
   - Mewing techniques
@@ -110,7 +122,7 @@ with open('your_image.png', 'rb') as img:
 params = {
     'image': 'image.png',
     'prompt': 'Analyze my facial features',
-    'job_id': 'test1'
+    'unique_key': 'test1'
 }
 analysis = requests.get('http://127.0.0.1:8000/mog', params=params)
 print(analysis.json()['formatted_response'])
@@ -124,10 +136,24 @@ sigma-boi/
 ├── jawline_math.py     # Jawline detection logic
 ├── gemini_evaluator/   # Gemini Vision integration
 │   └── evaluator.py    # Feature analysis logic
+├── services/           # Business logic services
+│   ├── jawline_service.py    # MediaPipe jawline analysis
+│   ├── gemini_service.py     # AI facial feature analysis
+│   └── file_service.py       # File upload/download management
+├── formatters/         # Response formatting
+│   └── response_formatter.py # Sigma male report formatting
+├── utils/              # Utility functions
+│   └── s3Helper.py     # AWS S3 integration
 ├── test_cli.py        # CLI testing interface
 ├── requirements.txt    # Project dependencies
-└── uploads/           # Uploaded images directory
+├── uploads/           # Uploaded images directory (create locally)
+├── guidance/          # Generated analysis files (create locally)
+├── mesh/              # Processed images with landmarks (create locally)
+├── evaluation/        # Downloaded S3 files cache (create locally)
+└── templates/         # HTML templates (create locally)
 ```
+
+> **Note**: Directories marked with "(create locally)" are ignored by git but required for the application to run. Use the setup command above to create them.
 
 ## 🛠️ Development
 

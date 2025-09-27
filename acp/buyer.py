@@ -18,7 +18,7 @@ load_dotenv(override=True)
 
 def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
     env = EnvSettings()
-
+    global_job: Optional[ACPJob] = None
     if env.WHITELISTED_WALLET_PRIVATE_KEY is None:
         raise ValueError("WHITELISTED_WALLET_PRIVATE_KEY is not set")
     if env.BUYER_AGENT_WALLET_ADDRESS is None:
@@ -87,6 +87,7 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
             else:
                 if not job_queue:
                     job_event.clear()
+        return job, memo_to_sign
 
     def on_new_task(job: ACPJob, memo_to_sign: Optional[ACPMemo] = None):
         print(f"[on_new_task] Received job {job.id} (phase: {job.phase})")
@@ -109,8 +110,10 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
                     break
         elif job.phase == ACPJobPhase.COMPLETED:
             print("Job completed", job)
+            return job
         elif job.phase == ACPJobPhase.REJECTED:
             print("Job rejected", job)
+            return job
 
     threading.Thread(target=job_worker, daemon=True).start()
 
@@ -159,7 +162,9 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
     print("Listening for next steps...")
     threading.Event().wait()
+    return global_job
 
 
 if __name__ == "__main__":
-    buyer(image_url="SleepyJoe.png", prompt="I want to start my self improvement and looks maxxing journey. Please advice on how I can improve by analysing my jawline")
+    deliverable = buyer(sys.argv[1], sys.argv[2], use_thread_lock=False)
+    print(str(deliverable))

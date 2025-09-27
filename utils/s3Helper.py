@@ -1,7 +1,9 @@
 import boto3
 from dotenv import load_dotenv
 import os
-from botocore.client import Config  
+from botocore.client import Config
+from botocore.exceptions import ClientError
+import logging  
 
 load_dotenv(override=True)
 
@@ -34,6 +36,39 @@ class s3Helper:
             ExpiresIn=18000
         )
         print(url)
+        
+        return url
+
+    def upload_file_content(self, file_content: bytes, key: str, filename: str, prompt: str = None) -> str:
+        """ Upload file content directly to s3 bucket, return presigned url"""
+        if file_content is None:
+            raise Exception('error, no file content')
+        
+        print(f"S3Helper - Uploading with key: {key}, filename: {filename}")
+        
+        # Determine content type from filename
+        content_type = "image/png"
+        if filename.lower().endswith(('.jpg', '.jpeg')):
+            content_type = "image/jpeg"
+        elif filename.lower().endswith('.gif'):
+            content_type = "image/gif"
+        elif filename.lower().endswith('.webp'):
+            content_type = "image/webp"
+        
+        self.s3.put_object(
+            Bucket=self.BUCKET_NAME,
+            Key=key,
+            Body=file_content,
+            ContentType=content_type,   
+            Metadata={"prompt": prompt or "", "filename": filename}
+        )
+        
+        url = self.s3.generate_presigned_url(
+            'get_object', 
+            Params={'Bucket':self.BUCKET_NAME, 'Key':key},
+            ExpiresIn=18000
+        )
+        print(f"File uploaded to S3: {url}")
         
         return url
 
