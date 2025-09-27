@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from fastapi import HTTPException
-import acp 
+from acp import buyer 
 from PIL import Image
 import shutil
 import os
@@ -178,9 +178,11 @@ async def call_buyer(
             # Read the uploaded file in chunks and write to the local file
         while content := await image.read(1024 * 1024): # Read in 1MB chunks
             buffer.write(content)
-    try: 
-        deliverable = acp.buyer(image_url=file_location, prompt=prompt)
+    try:
+        print("calling buyer")
+        deliverable = buyer.buyer(image_url=file_location, prompt=prompt)
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
         return {
             "error": "Internal server error",

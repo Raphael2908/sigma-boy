@@ -166,7 +166,5 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
 
 
 if __name__ == "__main__":
-    deliverable = buyer(image_url="SleepyJoe.png", prompt="I want to start my self improvement and looks maxxing journey. Please advice on how I can improve by analysing my jawline")
+    deliverable = buyer(sys.argv[1], sys.argv[2], use_thread_lock=False)
     print(str(deliverable))
-    return deliverable
-    
