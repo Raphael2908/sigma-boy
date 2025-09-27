@@ -115,10 +115,10 @@ export default function Page() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div>• Symmetry score: <span className="font-semibold">7.8/10</span></div>
-              <div>• Skin analysis: “Mild T‑zone oiliness; consider niacinamide 4–5%.”</div>
-              <div>• Hairstyle fit: "Textured crop, medium fade"</div>
-              <div>• Grooming: "Tidy brows; light stubble suits your jawline"</div>
-              <div>• Lifestyle: “+Protein 20–30g breakfast; 7–8h sleep target.”</div>
+              <div>• Skin analysis: Mild T‑zone oiliness; consider niacinamide 4–5%.</div>
+              <div>• Hairstyle fit: Textured crop, medium fade</div>
+              <div>• Grooming: Tidy brows; light stubble suits your jawline</div>
+              <div>• Lifestyle: +Protein 20–30g breakfast; 7–8h sleep target.</div>
             </CardContent>
           </Card>
         </div>

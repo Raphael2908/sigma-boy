@@ -10,7 +10,6 @@ import { Upload, Loader2, ImageIcon, Wand2, Link as LinkIcon, AlertCircle } from
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -46,9 +45,9 @@ async function callAnalyzeApi(params: { file: File; prompt: string }): Promise<A
     // Try to parse API error shape
     let message = `Request failed with status ${res.status}`;
     try {
-      const payload: ApiError | any = await res.json();
+      const payload: ApiError = await res.json();
       if (payload?.message) message = payload.message;
-    } catch (_) {}
+    } catch (exception) {console.log(exception);}
     throw new Error(message);
   }
 
@@ -122,8 +121,9 @@ export default function TrySigmaBoyPage() {
       setResult(null);
       const data = await callAnalyzeApi({ file, prompt });
       setResult(data);
-    } catch (err: any) {
-      setError(err?.message ?? "Something went wrong.");
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong.");
     } finally {
       setSubmitting(false);
     }
