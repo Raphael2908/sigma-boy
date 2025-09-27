@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from acp import buyer 
 from PIL import Image
 import shutil
+import asyncio
 import os
 import jawline_math as jm
 # Temporarily commenting out these imports for testing
@@ -180,7 +181,7 @@ async def call_buyer(
             buffer.write(content)
     try:
         print("calling buyer")
-        deliverable = buyer.buyer(image_url=file_location, prompt=prompt)
+        deliverable = asyncio.run(buyer.buyer(image_url=file_location, prompt=prompt))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
