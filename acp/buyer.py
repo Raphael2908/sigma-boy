@@ -11,12 +11,13 @@ from virtuals_acp.env import EnvSettings
 from virtuals_acp.job import ACPJob
 from virtuals_acp.models import ACPAgentSort, ACPJobPhase, ACPGraduationStatus, ACPOnlineStatus
 import uuid
-
+from ..utils.s3Helper import s3Helper
 import requests
 
 load_dotenv(override=True)
 
 def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
+    print("buyer started")
     env = EnvSettings()
     global_job: Optional[ACPJob] = None
     if env.WHITELISTED_WALLET_PRIVATE_KEY is None:
@@ -31,15 +32,16 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
     initiate_job_lock = threading.Lock()
     job_event = threading.Event()
 
-
+    print("ininitialise queues")
+    
     with open(image_url, "rb") as f:
         key = uuid.uuid4()
         files = {"image": (image_url, f, "image/png")}
-        data = {"key": str(key), "prompt": prompt}
-        res = requests.post("http://127.0.0.1:8000/upload", files=files, data=data)
+        s3_image_url = s3Helper.s3Helper.upload_file_content(f, str(key), image_url, prompt)
+        print("uploading image")
 
     s3_image_url = res.json()['image_url']
-
+    print("uploaded image")
     def safe_append_job(job, memo_to_sign: Optional[ACPMemo] = None):
         if use_thread_lock:
             print(f"[safe_append_job] Acquiring lock to append job {job.id}")
@@ -161,10 +163,10 @@ def buyer(image_url:str, prompt: str, use_thread_lock: bool = True):
         print(f"Job {job_id} initiated.")
 
     print("Listening for next steps...")
-    threading.Event().wait()
+    # threading.Event().wait()
     return global_job
 
 
 if __name__ == "__main__":
-    deliverable = buyer(sys.argv[1], sys.argv[2], use_thread_lock=False)
+    deliverable = buyer(image_url="SleepyJoe.png", prompt="I want to start my self improvement and looks maxxing journey. Please advice on how I can improve by analysing my jawline")
     print(str(deliverable))
